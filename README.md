@@ -1,260 +1,260 @@
 # RISC-V ASIC Physical Design
 
-A public-facing engineering record of ASIC implementation and physical-design work on a **32-bit, five-stage pipelined RISC-V processor** using Cadence Genus and Cadence Innovus during the SCL internship.
+> **SCL Internship · Cadence Genus + Innovus · 180 nm ASIC implementation**
 
-> **Scope note:** The supplied material contains the processor RTL plus implementation evidence. This repository therefore distinguishes the supplied/upstream RTL from the ASIC implementation activity. It does not claim authorship of the original processor RTL unless that is directly established by the supplied material.
+A public, interview-oriented engineering record of the ASIC implementation work performed on a **32-bit, five-stage RV32I RISC-V processor**, covering synthesis, floorplanning, placement, CTS, routing, post-route optimization, chip-level I/O integration, memory-integration work, and physical-design analysis.
 
-## Overview
+The repository deliberately separates **evidence-backed results** from **reconstructed reference scripts**. It does not claim that an internal SCL TCL script has been reproduced verbatim when the original script was not supplied.
 
-The SCL internship report describes a five-stage pipelined RISC-V processor based on the RV32I instruction-set architecture. The reported implementation flow covered synthesis in Cadence Genus and physical implementation in Cadence Innovus, including floorplanning, placement, clock-tree synthesis, routing, post-route optimization, area/power analysis, memory-macro integration, I/O pad integration, and preparation for GDSII generation.
+## Project at a glance
 
-The report describes both a core-only implementation and a later chip-level configuration with memory macros and I/O pads.
-
-## Objective
-
-The implementation exercise was used to gain practical exposure to ASIC realization of a non-trivial pipelined processor and to the transition from verified RTL to a physically implemented design.
-
-## Design Under Test
-
-- Architecture: RV32I
-- Datapath: 32-bit
-- Pipeline: IF / ID / EX / MEM / WB
-- Functional blocks visible in the supplied RTL include:
-  - ALU / ALU decoder
-  - register file
-  - control logic
-  - branch comparator / target logic
-  - hazard detection and forwarding
-  - pipeline registers
-  - CSR file
-  - data-memory interface
-  - write-back/result selection
-
-The supplied RTL snapshot contains these modules under `rtl/`.
-
-## Tools & Technology
-
-| Item | Evidence |
+| Item | Evidence-backed detail |
 |---|---|
-| Cadence Genus | SCL report |
-| Cadence Innovus | SCL report and supplied screenshots |
-| Synopsys Design Compiler | Mentioned in the SCL report as part of internship exposure |
-| Technology library | `tsl18fs120_scl_ss_1` appears in the reported Genus RISC-V area/power section |
-| Process context | SCL report describes a 180 nm CMOS process |
+| Architecture | 32-bit RV32I, 5-stage IF/ID/EX/MEM/WB |
+| Synthesis | Cadence Genus 25.10-p002_1 |
+| Physical implementation | Cadence Innovus 25.1/25.10-era evidence |
+| Reported technology library | `tsl18fs120_scl_ss_1` |
+| Reported Genus power | `1.86221e-03 W` |
+| Innovus instances | `6525` |
+| Innovus area | `226623.040` |
+| Chip-level pads | `265` total / `234` signal / `15` VDD / `16` VSS |
+| WNS/TNS | Not available in the supplied RISC-V result evidence |
+| LVS | Not available |
 
-The public repository intentionally does **not** contain the PDK, standard-cell libraries, IO libraries, memory macros, or EDA installation assets.
+## What this repository demonstrates
 
-## ASIC Flow
+- RTL-to-gate synthesis methodology in Cadence Genus
+- Technology mapping and optimization
+- Physical implementation in Cadence Innovus
+- Floorplanning and power-planning concepts
+- Standard-cell placement
+- Clock-tree synthesis
+- Routing and post-route optimization
+- Chip-level pad-ring integration
+- Memory-integration considerations
+- Area and power reporting
+- Physical-verification flow and GDSII preparation
+- Professional handling of incomplete/conflicting signoff evidence
+
+## Architecture
+
+The SCL report describes the processor as a 32-bit RV32I five-stage pipeline:
+
+```text
+IF → ID → EX → MEM → WB
+```
+
+The supplied RTL snapshot contains ALU/decoder logic, register file, control logic, branch handling, hazard detection, pipeline registers, CSR logic, data-memory interface and write-back logic.
 
 ![RTL-to-GDSII flow](docs/rtl-to-gdsii.svg)
 
-1. RTL
-2. Functional verification
-3. Logic synthesis
-4. Floorplanning
-5. Placement
-6. Clock-tree synthesis
-7. Routing
-8. Post-route optimization
-9. Physical verification / timing analysis
-10. GDSII preparation or export
+Detailed architecture notes: [`docs/architecture/README.md`](docs/architecture/README.md)
 
-The report explicitly describes Genus synthesis followed by Innovus backend implementation.
+## Implementation flow
 
-## 1. RTL
+### 1. RTL and functional verification
 
-The supplied RTL snapshot is retained under `rtl/`. The original filenames are preserved.
+The supplied core RTL is retained under [`rtl/`](rtl/). The PDK-specific chip-level wrapper is intentionally omitted from the public repository because it directly instantiates technology-specific IO cells.
 
-No attempt has been made to rewrite the RTL to make it look like a newly authored design.
+### 2. Cadence Genus synthesis
 
-## 2. Synthesis
+The internship report documents the following sequence:
 
-Cadence Genus was used to map the processor RTL to the SCL standard-cell technology library.
+```text
+read_hdl
+elaborate
+define_clock
+external_delay
+check_design
+syn_gen
+syn_map
+syn_opt
+report_timing
+report_power
+write_hdl
+write_sdc
+```
 
-The report identifies:
-- library: `tsl18fs120_scl_ss_1`
-- operating condition: `_nominal_ (balanced_tree)`
-- wireload mode: `enclosed`
-- area mode: `timing library`
+The reported RISC-V synthesis used technology library `tsl18fs120_scl_ss_1` under `_nominal_ (balanced_tree)` conditions. The Genus power report gives a total of `1.86221e-03 W`.
 
-A reported Genus total power value is included in `results/summary.md`.
+See [`reports/synthesis/genus_report.md`](reports/synthesis/genus_report.md).
 
-## 3. Floorplanning
+### 3. Floorplanning
 
-The report states that the synthesized processor was imported into Innovus and physically implemented. The supplied screenshots include core/chip-level Innovus views.
+The report describes establishing core dimensions and placement boundaries, followed by power planning. The chip-level implementation also involved I/O pads and memory integration.
 
-## 4. Placement
+### 4. Placement
 
-Standard-cell placement formed part of the reported backend flow.
+The synthesized gate-level design was placed in Innovus, with optimization intended to balance timing, area and routing congestion.
 
-## 5. CTS
+### 5. Clock-tree synthesis
 
-Clock-tree synthesis was part of the reported Innovus implementation flow.
+CTS was part of the documented backend flow. The public reference flow uses the standard Innovus `ccopt_design` stage.
 
-## 6. Routing
+### 6. Routing
 
-Routing was performed as part of the reported backend flow, followed by post-route optimization.
+Routing followed CTS. The documented methodology then uses post-route optimization where required.
 
-## 7. Post-Route Optimization
+### 7. Post-route optimization
 
-The SCL report states that `optDesign` was used where required to improve timing performance.
+The SCL report explicitly identifies `optDesign` as the post-route optimization utility.
 
-## 8. Timing Analysis
+### 8. Timing analysis
 
-The report describes timing-constrained implementation, but the supplied report section does **not** provide a clean numerical RISC-V WNS/TNS/setup/hold result that can be safely published here.
+A technically honest repository should not invent timing results. The supplied RISC-V result section does not contain a clean numerical WNS/TNS/setup/hold result attributable to the final RISC-V implementation.
 
-Accordingly:
-- WNS: not available in the supplied evidence
-- TNS: not available in the supplied evidence
-- setup violations: not available
-- hold violations: not available
-- clock period: not available as a final RISC-V result
+Therefore:
 
-No timing number has been invented.
+- **WNS:** not available
+- **TNS:** not available
+- **setup violations:** not available
+- **hold violations:** not available
+- **final clock period:** not available
 
-## 9. Physical Verification
+See [`reports/timing/riscv_timing_status.md`](reports/timing/riscv_timing_status.md).
 
-The report states that DRC was part of the ASIC implementation methodology. A numerical RISC-V DRC result is not clearly supplied in the RISC-V result section.
+### 9. Physical verification
 
-Therefore this repository does not claim a numerical RISC-V DRC count.
+The report documents DRC as part of the Innovus flow. A clean RISC-V-specific DRC/LVS result is not present in the supplied result evidence, so none is claimed here.
 
-## 10. GDSII
+See [`reports/physical_verification/drc_connectivity.md`](reports/physical_verification/drc_connectivity.md).
 
-The report states that completed layouts were prepared for GDSII generation. No GDSII database was supplied with the public-source package, so no GDS file is included here.
+### 10. GDSII
 
-## Memory Macro Integration
-
-The report explicitly states that the final RISC-V implementation incorporated memory macros.
-
-However, the supplied Innovus area excerpt shows:
-
-- `k11` / `data_memory`: **0 instances** in the displayed area table.
-
-This is retained as a source discrepancy rather than being silently reconciled. The repository therefore documents **reported memory-macro integration**, but does not claim a specific macro count, macro name, or macro area from the available evidence.
-
-The supplied `data_memory_synthesis_issue` note also documents a behavioral memory-array synthesis problem and recommends replacing a large behavioral array with a foundry SRAM macro for tapeout. That note is included under `docs/notes/`.
-
-## I/O Pad Integration
-
-The supplied `riscv_chip_top.io` file provides a concrete chip-level pad-ring definition.
-
-### Extracted pad-ring facts
-
-| Item | Supplied evidence |
-|---|---:|
-| Total pads | 265 |
-| Signal pads | 234 |
-| VDD pads | 15 |
-| VSS pads | 16 |
-| Clock input pads | 1 |
-| Reset input pads | 1 |
-| Instruction-data input bus | 32 |
-| Instruction-address output bus | 32 |
-| Other output/debug signals | 169 |
-
-### Clockwise side distribution
-
-| Side | Signal pads | Power/ground pads | Total |
-|---|---:|---:|---:|
-| Bottom | 34 | 6 | 40 |
-| Right | 65 | 8 | 73 |
-| Top | 70 | 9 | 79 |
-| Left | 65 | 8 | 73 |
-| **Total** | **234** | **31** | **265** |
-
-The raw `.io` files and PDK-specific pad-cell source are intentionally omitted from this public package. The values above are extracted from them.
+The report states that the completed layouts were prepared for GDSII generation. No GDS database is included in this public repository.
 
 ## Results
 
-### Published implementation snapshot
+### Area and power
 
-| Metric | Value | Notes |
+| Metric | Value | Source |
 |---|---:|---|
-| Reported Genus library | `tsl18fs120_scl_ss_1` | RISC-V report section |
-| Genus total power | `1.86221e-03 W` | Directly reported |
-| Innovus instance count | `6525` | `report_area` |
-| Innovus total area | `226623.040` | `report_area` |
-| `k11` / `data_memory` instances | `0` | Displayed area excerpt |
-| WNS/TNS | Not available | Not reported cleanly |
-| DRC count | Not available | Not reported cleanly for RISC-V |
-| LVS | Not available | No numerical/status evidence supplied |
+| Genus total power | `1.86221e-03 W` | SCL report, Ch. 7.5 |
+| Innovus instance count | `6525` | Innovus `report_area` |
+| Innovus total area | `226623.040` | Innovus `report_area` |
 
-### Important report-integrity note
+The detailed evidence is preserved in [`reports/`](reports/).
 
-The Innovus power block printed in the RISC-V section is numerically identical to the UART section and includes UART-specific identifiers such as `tx_inst_tx_reg`. It is therefore treated as a likely report-copy artifact and **is not used as a validated RISC-V power result** in this repository.
+### Important report-integrity issue
+
+The Innovus power block printed in the RISC-V section of the supplied report contains the same numerical values and UART-specific identifiers as the UART report, including `tx_inst_tx_reg` and a 339-instance total. It is therefore **not used as a validated RISC-V Innovus power metric**.
+
+That discrepancy is documented rather than silently copied into the project's headline results.
+
+## I/O pad-ring integration
+
+The supplied chip-level pad definition contains **265 pads**:
+
+| Pad class | Count |
+|---|---:|
+| Signal | 234 |
+| VDD | 15 |
+| VSS | 16 |
+| **Total** | **265** |
+
+### Clockwise distribution
+
+| Side | Signal | VDD | VSS | Total |
+|---|---:|---:|---:|---:|
+| Bottom | 34 | 3 | 3 | 40 |
+| Right | 65 | 4 | 4 | 73 |
+| Top | 70 | 4 | 5 | 79 |
+| Left | 65 | 4 | 4 | 73 |
+| **Total** | **234** | **15** | **16** | **265** |
+
+The raw `.io` file is intentionally omitted; the evidence-derived pad record is in [`docs/io_pad_ring.md`](docs/io_pad_ring.md).
+
+## Memory macro integration
+
+The SCL report states that the final RISC-V implementation incorporated memory macros and I/O pads. The supplied implementation notes also document a synthesis issue around the behavioral `data_memory` array and the production need for a technology memory macro.
+
+The published Innovus area excerpt contains `k11 data_memory` with an instance count of `0`. Because that conflicts with the narrative claim of final memory integration, this repository does **not** invent a final macro count. See [`docs/memory_macro_integration.md`](docs/memory_macro_integration.md).
 
 ## Screenshots
 
-Sanitized screenshots are stored under `images/physical_design/` and `images/io_memory/`.
+The following sanitized screenshots show the physical implementation evidence supplied with the project.
 
-The supplied screenshots were cropped to remove visible SCL workstation paths/hostnames from title bars and console regions. Original screenshots are intentionally not redistributed.
+### Routed RISC-V implementation
 
-## Repository Structure
+![Innovus routed RISC-V](images/physical_design/Screenshot%20from%202026-06-30%2015-20-57.png)
+
+### Core/chip physical-design view
+
+![RISC-V physical design](images/physical_design/Screenshot%20from%202026-07-02%2009-59-14.png)
+
+### I/O / memory integration views
+
+| IO / memory view | IO / memory view |
+|---|---|
+| ![](images/io_memory/Screenshot%20from%202026-07-01%2017-32-28.png) | ![](images/io_memory/Screenshot%20from%202026-07-02%2010-02-50.png) |
+| ![](images/io_memory/Screenshot%20from%202026-07-02%2010-03-20.png) | ![](images/io_memory/Screenshot%20from%202026-07-02%2010-03-42.png) |
+
+## Physical-design debug playbook
+
+For interview preparation, [`docs/notes/physical_design_debug_playbook.md`](docs/notes/physical_design_debug_playbook.md) reconstructs the practical placement → CTS → route → post-route → DRC/debug loop. It is explicitly labeled reconstructed rather than presented as an original command transcript.
+
+## Reference scripts
+
+The scripts under [`scripts/`](scripts/) are **reconstructed reference flows**, based on the documented SCL methodology and standard Cadence flow structure. They are useful for demonstrating the execution model in an interview, but they are not represented as the exact proprietary SCL scripts.
+
+- [`scripts/genus/riscv_synthesis_reference.tcl`](scripts/genus/riscv_synthesis_reference.tcl)
+- [`scripts/innovus/01_init_floorplan_reference.tcl`](scripts/innovus/01_init_floorplan_reference.tcl)
+- [`scripts/innovus/02_place_cts_route_reference.tcl`](scripts/innovus/02_place_cts_route_reference.tcl)
+- [`scripts/innovus/03_signoff_reference.tcl`](scripts/innovus/03_signoff_reference.tcl)
+
+## Reproduction
+
+A full rerun requires the original SCL technology environment: standard-cell timing/physical libraries, IO library, memory macro collateral, authorized Cadence installation, and the original implementation database/configuration. Those are not included here.
+
+The conceptual rerun is:
+
+```text
+RTL
+ ↓
+Genus: elaborate → synthesize → report → export netlist/SDC
+ ↓
+Innovus: init → floorplan → power plan → placement
+ ↓
+CTS → route → post-route optimization
+ ↓
+timing / area / power / DRC / connectivity
+ ↓
+GDSII stream-out
+```
+
+## Repository structure
 
 ```text
 riscv-asic-physical-design/
 ├── README.md
-├── LICENSE
-├── .gitignore
 ├── rtl/
 ├── docs/
-│   ├── rtl-to-gdsii.svg
-│   ├── source_reference.md
+│   ├── architecture/
+│   ├── io_pad_ring.md
+│   ├── memory_macro_integration.md
 │   ├── publication_audit.md
-│   └── notes/
-├── images/
-│   ├── physical_design/
-│   └── io_memory/
+│   └── rtl-to-gdsii.svg
+├── scripts/
+│   ├── genus/
+│   └── innovus/
 ├── reports/
 │   ├── synthesis/
 │   ├── timing/
 │   ├── area/
 │   ├── power/
 │   └── physical_verification/
-├── scripts/
-│   └── README.md
+├── images/
 └── results/
-    └── summary.md
 ```
 
-## Reproduction / Usage
+## Publication / confidentiality
 
-A full rerun cannot be performed from this public repository alone because the supplied implementation depended on SCL infrastructure, proprietary technology libraries/PDKs, and Cadence installation assets that are not redistributed.
+The public repository excludes PDKs, standard-cell libraries, IO LEFs, memory macro databases, raw SCL `.io` files, Cadence databases, GDS/DEF outputs, internal absolute paths and hostnames.
 
-The intended conceptual order is:
+See [`docs/publication_audit.md`](docs/publication_audit.md).
 
-```text
-source RTL
-   ↓
-Genus setup + constraints
-   ↓
-synthesis / reports / gate-level netlist
-   ↓
-Innovus initialization
-   ↓
-floorplan → power plan → placement
-   ↓
-CTS → routing → post-route optimization
-   ↓
-timing / area / power / physical verification
-   ↓
-GDSII preparation
-```
+## Resume-safe description
 
-Actual Genus/Innovus command scripts were **not** supplied in the uploaded material, so this repository does not fabricate runnable scripts.
+> **ASIC Physical Design — 32-bit 5-stage RV32I RISC-V Processor:** Performed Cadence Genus synthesis and Innovus physical implementation including floorplanning, placement, CTS, routing, post-route optimization, chip-level I/O pad-ring integration and memory-integration analysis; evaluated area and power from implementation reports and documented signoff limitations.
 
-## Limitations
-
-- Proprietary SCL/PDK material is excluded.
-- PDK-specific IO wrapper RTL is excluded.
-- Raw `.io` files are excluded from the public package.
-- No GDSII database was supplied.
-- No final WNS/TNS/setup/hold values were supplied for RISC-V.
-- No clean numerical RISC-V DRC/LVS signoff result was supplied.
-- SPI RTL/scripts are not relevant to this repository and are therefore not included.
-
-## Credits / Source
-
-The implementation evidence comes from the supplied SCL internship report and the source/screenshot material provided for this repository build.
-
-The report describes the internship work in the Digital Design and Verification Group at SCL and identifies the RISC-V implementation as part of the Cadence Genus/Innovus ASIC-flow work.
+This wording stays within the evidence contained in the supplied internship material.

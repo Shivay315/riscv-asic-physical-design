@@ -34,7 +34,7 @@ dc_work/
 work/
 runs/
 outputs/
-results/
+build/
 temp/
 tmp/
 

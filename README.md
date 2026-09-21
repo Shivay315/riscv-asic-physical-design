@@ -253,8 +253,3 @@ The public repository excludes PDKs, standard-cell libraries, IO LEFs, memory ma
 
 See [`docs/publication_audit.md`](docs/publication_audit.md).
 
-## Resume-safe description
-
-> **ASIC Physical Design — 32-bit 5-stage RV32I RISC-V Processor:** Performed Cadence Genus synthesis and Innovus physical implementation including floorplanning, placement, CTS, routing, post-route optimization, chip-level I/O pad-ring integration and memory-integration analysis; evaluated area and power from implementation reports and documented signoff limitations.
-
-This wording stays within the evidence contained in the supplied internship material.

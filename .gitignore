@@ -1,0 +1,58 @@
+# EDA / generated databases
+*.db
+*.lib
+*.lef
+*.def
+*.gds
+*.gds2
+*.oas
+*.oa
+*.spef
+*.sdf
+*.vcd
+*.evcd
+*.fsdb
+*.wlf
+*.log
+*.rpt
+*.rpt.gz
+*.gz
+
+# Cadence / Synopsys working directories
+*.enc
+*.enc.dat
+*.enc.log
+*.enc.run
+*.cmd
+*.history
+*.vst
+*.vst.gz
+innovus_work/
+genus_work/
+genus-work/
+dc_work/
+work/
+runs/
+outputs/
+results/
+temp/
+tmp/
+
+# OS/editor
+.DS_Store
+__MACOSX/
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+env/
+
+# Secrets / local configs
+.env
+*.lic
+license.dat

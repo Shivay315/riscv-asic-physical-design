@@ -1,0 +1,21 @@
+# Portfolio Repository License
+
+Copyright (c) 2026 Shivay Mendiratta
+
+This repository is a portfolio/documentation package assembled from materials
+available to the author.
+
+Unless a file is explicitly identified as third-party, proprietary, or
+upstream material, the documentation authored for this repository may be
+reused with attribution.
+
+No license is granted by this file to:
+- SCL/MeitY proprietary or confidential material;
+- foundry PDKs, standard-cell/IO libraries, memory macros, LEF/DEF/GDSII
+  databases, technology files, or licensed EDA assets;
+- third-party or upstream RTL whose publication rights are not owned by the
+  repository author.
+
+Such materials have been intentionally omitted from this public-facing
+package. Verify your internship/employer publication permissions before
+publishing the repository.
